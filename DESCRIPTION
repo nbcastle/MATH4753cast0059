@@ -1,0 +1,10 @@
+Package: MATH4753cast0059
+Type: Package
+Title: Holds MATH4753 functions
+Version: 0.1.0
+Author: Nick Castle
+Maintainer: Nick Castle <ncastle@ou.edu>
+Description: Subset of MATH4753, functions and coursework
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true

@@ -1,0 +1,211 @@
+#' @title my read function
+#'
+#' @description This function reads .csv data into the environment
+#'
+#' @param dird directory csv is stored in
+#' @param csv the title of the .csv title as a string
+#'
+#' @return table containing data
+#' @export
+#'
+#' @examples
+#' dird = "C:\\Users\\Admin\\Desktop\\Applied Statistical Methods\\Lab 4\\"
+#' data = myread(dird, 'SPRUCE.csv')
+#'
+myread=function(dird, csv){
+  fl=paste(dird,csv,sep="")
+  read.table(fl,header=TRUE,sep=",")
+}
+
+
+
+
+
+#' @title my binomial function
+#' @description finds the number of successes in each iteration given a probability.
+#' The function adds the number of iterations that received each number of successes,
+#' divides by overall number of iterations, and represents the distribution as a percentage.
+#' @param iter number of iterations
+#' @param n number of samples taken each iteration, with replacement
+#' @param p probability of TRUE sample
+#'
+#' @return a bar graph showing the distribution and associated table
+#' @export
+#'
+#' @examples mybin()
+#'
+#'
+mybin=function(iter=100,n=10, p=0.5){
+  # make a matrix to hold the samples
+  #initially filled with NA's
+  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  #Make a vector to hold the number of successes in each trial
+  succ=c()
+  for( i in 1:iter){
+    #Fill each column with a new sample
+    sam.mat[,i]=sample(c(1,0),n,replace=TRUE, prob=c(p,1-p))
+    #Calculate a statistic from the sample (this case it is the sum)
+    succ[i]=sum(sam.mat[,i])
+  }
+  #Make a table of successes
+  succ.tab=table(factor(succ,levels=0:n))
+  #Make a barplot of the proportions
+  barplot(succ.tab/(iter), col=rainbow(n+1),
+          main=paste("binomial distribution  ", " iteration ",
+                     i, " n= ", n,sep=""),
+          xlab="Number of successes"
+          )
+  succ.tab/iter
+}
+
+
+
+
+#' @title my multinomial function
+#' @description finds the number of successes in each iteration given an array of probabilities, 1 per option.
+#' The function adds the number of iterations that received each number of successes,
+#' divides by overall number of iterations, and represents the distribution as a percentage.
+#' @param iter number of iterations
+#' @param n number of samples taken each iteration, with replacement
+#' @param p array of probabilities for each outcome, add to 1
+#'
+#' @return a barplot showing the relative frequencies and a corresponding table
+#' @export
+#'
+#' @examples mymult()
+#'
+mymult=function(iter=100,n=10, p=c(1,1,1,1)/4){
+  # make a matrix to hold the samples
+  #initially filled with NA's
+  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  #The number of categories is k
+  k=length(p)
+  # Make a matrix that will hold the frequencies in each sample
+  tab.mat=matrix(NA,nr=k,nc=iter, byrow=TRUE)
+
+
+  for(i in 1:iter){
+    #Fill each column with a new sample
+    sam.mat[,i]=sample(1:k,n,replace=TRUE, prob=p)
+    #Collect all the frequencies of each of the k values
+    tab.mat[,i]=table(factor(sam.mat[,i],levels=1:k))
+  }
+  # sum the frequecies
+  freq=apply(tab.mat,1,sum)
+  # put names to them
+  names(freq)=1:k
+  #create a barplot of relative freq
+  barplot(freq/(n*iter),col=rainbow(k),
+          main=paste("multinomial distribution  ", " iteration ",
+                     i, " n= ", n,sep="")
+          )
+  tab.mat
+}
+
+
+
+
+
+#' @title my hypergeometric function
+#' @description a function which shows the hypergeometric distribution
+#' of a sample. Shows probability of number of successes while sampling without replacement
+#'
+#' @param iter number of iterations
+#' @param N population size
+#' @param r number of successes in population
+#' @param n number of samples each iteration without replacement
+#'
+#' @return a bar plot of the distribution and associated table
+#' @export
+#'
+#' @examples myhyper()
+#'
+myhyper=function(iter=100,N=20,r=12,n=5){
+  # make a matrix to hold the samples
+  #initially filled with NA's
+  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  #Make a vector to hold the number of successes over the trials
+  succ=c()
+  for( i in 1:iter){
+    #Fill each column with a new sample
+    sam.mat[,i]=sample(rep(c(1,0),c(r,N-r)),n,replace=FALSE)
+    #Calculate a statistic from the sample (this case it is the sum)
+    succ[i]=sum(sam.mat[,i])
+  }
+  #Make a table of successes
+  succ.tab=table(factor(succ,levels=0:n))
+  #Make a barplot of the proportions
+  barplot(succ.tab/(iter), col=rainbow(n+1),
+          main=paste("hypergeom. distribution  ", " iteration ", i, " n= ", n,sep=""),
+          xlab="successes"
+          )
+  succ.tab/iter
+}
+
+
+
+
+
+#' @title my sample function
+#' @description takes n samples each iteration with replacement and
+#' shows the resultant distribution
+#'
+#' @param n number of samples each iteration
+#' @param iter number of iterations
+#' @param time time between showing each plot
+#' @param last indicates that only last bar plot should be displayed
+#'
+#' @return a barplot of the distribution and a corresponding table
+#' @export
+#'
+#' @examples mysample()
+#'
+mysample=function(n, N=10, iter=10,time=0.1, last=FALSE, rep=TRUE){
+  for( i in 1:iter){
+    #make a sample
+    s=sample(1:N,n,replace=rep)
+    # turn the sample into a factor
+    sf=factor(s,levels=1:N)
+    #make a barplot
+    if(last == FALSE) {
+      barplot(table(sf)/n,beside=TRUE,col=rainbow(N),
+              main=paste("sample  ", " iteration ", i, " n= ", n,sep="") ,
+              ylim=c(0,0.2)
+      )
+    } else {
+      if(i == iter)
+        barplot(table(sf)/n,beside=TRUE,col=rainbow(N),
+                main=paste("sample  ", " iteration ", i, " n= ", n,sep="") ,
+                ylim=c(0,0.2)
+        )
+    }
+    #release the table
+    Sys.sleep(time)
+  }
+  table(sf)
+}
+
+
+#' @title my probability curve function
+#' @description uses mean and sd to create normal distribution, calculates
+#' probability below a and shows as shaded region and prints value to console
+#'
+#' @param mu average of distribution
+#' @param sigma sd of distribution
+#' @param a upper limit for probability, filled region
+#'
+#' @return plot of norm distribution w/ filled region, probability as list
+#' @export
+#'
+#' @examples
+#' myncurve(5, 2, 3)
+#'
+myncurve = function(mu, sigma, a){
+  curve(dnorm(x,mean=mu,sd=sigma),
+        xlim = c(mu-3*sigma, mu + 3*sigma),
+        ylab=paste('norm  mean:', mu,'  sd:', sigma))
+  xcurve=seq(mu-3*sigma, a,length=1000)
+  ycurve=dnorm(xcurve,mean=mu,sd=sigma)
+  polygon(c(mu-3*sigma,xcurve,a),c(0,ycurve,0),col="Red")
+  cat('Prob:',round(pnorm(a, mean= mu, sd= sigma), 4))
+}

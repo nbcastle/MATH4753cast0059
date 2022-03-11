@@ -1,4 +1,4 @@
-data(ddt, envir=environment())
+
 
 #' @title my read function
 #'
@@ -256,13 +256,17 @@ myncurve = function(mu, sigma, a){
 #'
 #' @return a named list with a plot of the subsetted df, df before and after
 #' subsetting, and a relative frequency of river table
+#'
 #' @export
 #'
+#'@examples
+#'\dontrun{
+#'myddt(df = ddt, spec  = "CCATFISH")}
 #'
-myddt <- function(df=ddt, spec='CCATFISH'){
+myddt <- function(df, spec){
   # use dplyr to select only given species
   df %>%
-    filter(.data$SPECIES == spec) -> dat
+    filter(.data$SPECIES == {{spec}}) -> dat
 
   # write a csv to the working directory with subsetted ddt df
   write.csv(dat, paste('LvsWfor',spec,'.csv', sep=''))

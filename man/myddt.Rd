@@ -4,7 +4,7 @@
 \alias{myddt}
 \title{my ddt function for Project 1}
 \usage{
-myddt(df = ddt, spec = "CCATFISH")
+myddt(df, spec)
 }
 \arguments{
 \item{df}{the ddt dataframe or one similar}
@@ -19,4 +19,9 @@ subsetting, and a relative frequency of river table
 subsets the ddt df by a species given as a parameter, generates
 a corresponding plot, df before and after subsetting, and a relative frequency
 of river table
+}
+\examples{
+\dontrun{
+myddt(df = ddt, spec  = "CCATFISH")}
+
 }

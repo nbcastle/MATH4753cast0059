@@ -4,7 +4,7 @@
 \alias{myddt}
 \title{my ddt function for Project 1}
 \usage{
-myddt(df, spec)
+myddt(df = ddt, spec = "CCATFISH")
 }
 \arguments{
 \item{df}{the ddt dataframe or one similar}

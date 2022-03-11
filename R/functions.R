@@ -1,9 +1,13 @@
+data(ddt, envir=environment())
+
 #' @title my read function
 #'
 #' @description This function reads .csv data into the environment
 #'
 #' @param dird directory csv is stored in
 #' @param csv the title of the .csv title as a string
+#'
+#' @import utils
 #'
 #' @return table containing data
 #' @export
@@ -29,6 +33,10 @@ myread=function(dird, csv){
 #' @param n number of samples taken each iteration, with replacement
 #' @param p probability of TRUE sample
 #'
+#' @import grDevices
+#' @import graphics
+#' @import utils
+#'
 #' @return a bar graph showing the distribution and associated table
 #' @export
 #'
@@ -38,7 +46,7 @@ myread=function(dird, csv){
 mybin=function(iter=100,n=10, p=0.5){
   # make a matrix to hold the samples
   #initially filled with NA's
-  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  sam.mat=matrix(NA,nrow=n,ncol=iter, byrow=TRUE)
   #Make a vector to hold the number of successes in each trial
   succ=c()
   for( i in 1:iter){
@@ -54,7 +62,7 @@ mybin=function(iter=100,n=10, p=0.5){
           main=paste("binomial distribution  ", " iteration ",
                      i, " n= ", n,sep=""),
           xlab="Number of successes"
-          )
+  )
   succ.tab/iter
 }
 
@@ -69,6 +77,10 @@ mybin=function(iter=100,n=10, p=0.5){
 #' @param n number of samples taken each iteration, with replacement
 #' @param p array of probabilities for each outcome, add to 1
 #'
+#' @import grDevices
+#' @import graphics
+#' @import utils
+#'
 #' @return a barplot showing the relative frequencies and a corresponding table
 #' @export
 #'
@@ -77,11 +89,11 @@ mybin=function(iter=100,n=10, p=0.5){
 mymult=function(iter=100,n=10, p=c(1,1,1,1)/4){
   # make a matrix to hold the samples
   #initially filled with NA's
-  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  sam.mat=matrix(NA,nrow=n,ncol=iter, byrow=TRUE)
   #The number of categories is k
   k=length(p)
   # Make a matrix that will hold the frequencies in each sample
-  tab.mat=matrix(NA,nr=k,nc=iter, byrow=TRUE)
+  tab.mat=matrix(NA,nrow=k,ncol=iter, byrow=TRUE)
 
 
   for(i in 1:iter){
@@ -90,7 +102,7 @@ mymult=function(iter=100,n=10, p=c(1,1,1,1)/4){
     #Collect all the frequencies of each of the k values
     tab.mat[,i]=table(factor(sam.mat[,i],levels=1:k))
   }
-  # sum the frequecies
+  # sum the frequencies
   freq=apply(tab.mat,1,sum)
   # put names to them
   names(freq)=1:k
@@ -98,7 +110,7 @@ mymult=function(iter=100,n=10, p=c(1,1,1,1)/4){
   barplot(freq/(n*iter),col=rainbow(k),
           main=paste("multinomial distribution  ", " iteration ",
                      i, " n= ", n,sep="")
-          )
+  )
   tab.mat
 }
 
@@ -115,6 +127,10 @@ mymult=function(iter=100,n=10, p=c(1,1,1,1)/4){
 #' @param r number of successes in population
 #' @param n number of samples each iteration without replacement
 #'
+#' @import grDevices
+#' @import graphics
+#' @import utils
+#'
 #' @return a bar plot of the distribution and associated table
 #' @export
 #'
@@ -123,7 +139,7 @@ mymult=function(iter=100,n=10, p=c(1,1,1,1)/4){
 myhyper=function(iter=100,N=20,r=12,n=5){
   # make a matrix to hold the samples
   #initially filled with NA's
-  sam.mat=matrix(NA,nr=n,nc=iter, byrow=TRUE)
+  sam.mat=matrix(NA,nrow=n,ncol=iter, byrow=TRUE)
   #Make a vector to hold the number of successes over the trials
   succ=c()
   for( i in 1:iter){
@@ -138,7 +154,7 @@ myhyper=function(iter=100,N=20,r=12,n=5){
   barplot(succ.tab/(iter), col=rainbow(n+1),
           main=paste("hypergeom. distribution  ", " iteration ", i, " n= ", n,sep=""),
           xlab="successes"
-          )
+  )
   succ.tab/iter
 }
 
@@ -156,6 +172,10 @@ myhyper=function(iter=100,N=20,r=12,n=5){
 #' @param iter number of iterations
 #' @param time time between showing each plot
 #' @param last indicates that only last bar plot should be displayed
+#'
+#' @import grDevices
+#' @import graphics
+#' @import utils
 #'
 #' @return a barplot of the distribution and a corresponding table
 #' @export
@@ -196,6 +216,11 @@ mysample=function(n, N=10, iter=10,time=0.1, last=FALSE, rep=TRUE){
 #' @param sigma sd of distribution
 #' @param a upper limit for probability, filled region
 #'
+#' @import grDevices
+#' @import graphics
+#' @import utils
+#' @importFrom stats dnorm pnorm
+#'
 #' @return plot of norm distribution w/ filled region, probability as list
 #' @export
 #'
@@ -203,6 +228,7 @@ mysample=function(n, N=10, iter=10,time=0.1, last=FALSE, rep=TRUE){
 #' myncurve(5, 2, 3)
 #'
 myncurve = function(mu, sigma, a){
+  x=seq(mu-3*sigma, mu+3*sigma,length.out = 1000)
   curve(dnorm(x,mean=mu,sd=sigma),
         xlim = c(mu-3*sigma, mu + 3*sigma),
         ylab=paste('norm  mean:', mu,'  sd:', sigma))
@@ -211,7 +237,6 @@ myncurve = function(mu, sigma, a){
   polygon(c(mu-3*sigma,xcurve,a),c(0,ycurve,0),col="Red")
   cat('Prob:',round(pnorm(a, mean= mu, sd= sigma), 4))
 }
-
 
 
 
@@ -225,24 +250,27 @@ myncurve = function(mu, sigma, a){
 #'
 #' @import dplyr
 #' @import ggplot2
+#' @import grDevices
+#' @import graphics
+#' @import utils
 #'
 #' @return a named list with a plot of the subsetted df, df before and after
 #' subsetting, and a relative frequency of river table
 #' @export
 #'
 #'
-myddt <- function(df, spec){
+myddt <- function(df=ddt, spec='CCATFISH'){
   # use dplyr to select only given species
   df %>%
-    filter(SPECIES == spec) -> dat
+    filter(.data$SPECIES == spec) -> dat
 
   # write a csv to the working directory with subsetted ddt df
   write.csv(dat, paste('LvsWfor',spec,'.csv', sep=''))
 
   # create a plot of Length vs. Weight with subsetted data
   # point color corresponds to river and a quadratic curve is displayed
-  plot = ggplot(dat, aes(x = WEIGHT, y = LENGTH)) +
-    geom_point(aes(color = RIVER)) +
+  plot = ggplot(dat, aes(x = .data$WEIGHT, y = .data$LENGTH)) +
+    geom_point(aes(color = .data$RIVER)) +
     theme(axis.text.x = element_text(angle=65, vjust=0.6)) +
     geom_smooth(method = "lm", formula = y ~ x + I(x^2)) +
     labs(title="Nick Castle",
@@ -257,3 +285,5 @@ myddt <- function(df, spec){
        'subsetted dataframe' = dat,
        'relative frequency of river table' = table(df$RIVER)/length(df$RIVER))
 }
+
+

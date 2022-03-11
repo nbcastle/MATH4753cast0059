@@ -151,6 +151,8 @@ myhyper=function(iter=100,N=20,r=12,n=5){
 #' shows the resultant distribution
 #'
 #' @param n number of samples each iteration
+#' @param N size of each sample
+#' @param rep with or without replacement
 #' @param iter number of iterations
 #' @param time time between showing each plot
 #' @param last indicates that only last bar plot should be displayed
@@ -158,7 +160,7 @@ myhyper=function(iter=100,N=20,r=12,n=5){
 #' @return a barplot of the distribution and a corresponding table
 #' @export
 #'
-#' @examples mysample()
+#' @examples mysample(5)
 #'
 mysample=function(n, N=10, iter=10,time=0.1, last=FALSE, rep=TRUE){
   for( i in 1:iter){
@@ -208,4 +210,50 @@ myncurve = function(mu, sigma, a){
   ycurve=dnorm(xcurve,mean=mu,sd=sigma)
   polygon(c(mu-3*sigma,xcurve,a),c(0,ycurve,0),col="Red")
   cat('Prob:',round(pnorm(a, mean= mu, sd= sigma), 4))
+}
+
+
+
+
+#' @title my ddt function for Project 1
+#' @description subsets the ddt df by a species given as a parameter, generates
+#' a corresponding plot, df before and after subsetting, and a relative frequency
+#' of river table
+#'
+#' @param df the ddt dataframe or one similar
+#' @param spec the species selected by the user
+#'
+#' @import dplyr
+#' @import ggplot2
+#'
+#' @return a named list with a plot of the subsetted df, df before and after
+#' subsetting, and a relative frequency of river table
+#' @export
+#'
+#'
+myddt <- function(df, spec){
+  # use dplyr to select only given species
+  df %>%
+    filter(SPECIES == spec) -> dat
+
+  # write a csv to the working directory with subsetted ddt df
+  write.csv(dat, paste('LvsWfor',spec,'.csv', sep=''))
+
+  # create a plot of Length vs. Weight with subsetted data
+  # point color corresponds to river and a quadratic curve is displayed
+  plot = ggplot(dat, aes(x = WEIGHT, y = LENGTH)) +
+    geom_point(aes(color = RIVER)) +
+    theme(axis.text.x = element_text(angle=65, vjust=0.6)) +
+    geom_smooth(method = "lm", formula = y ~ x + I(x^2)) +
+    labs(title="Nick Castle",
+         subtitle=paste("Length vs Weight of", spec),
+         caption="Source: DDT.csv",
+         x="Weight",
+         y="Length")
+
+  # the function returns a list with the plot, df, subsetted df, and a relative frequency of river table
+  list('plot' = plot,
+       'dataframe' = df,
+       'subsetted dataframe' = dat,
+       'relative frequency of river table' = table(df$RIVER)/length(df$RIVER))
 }

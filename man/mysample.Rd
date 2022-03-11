@@ -9,11 +9,15 @@ mysample(n, N = 10, iter = 10, time = 0.1, last = FALSE, rep = TRUE)
 \arguments{
 \item{n}{number of samples each iteration}
 
+\item{N}{size of each sample}
+
 \item{iter}{number of iterations}
 
 \item{time}{time between showing each plot}
 
 \item{last}{indicates that only last bar plot should be displayed}
+
+\item{rep}{with or without replacement}
 }
 \value{
 a barplot of the distribution and a corresponding table
@@ -23,6 +27,6 @@ takes n samples each iteration with replacement and
 shows the resultant distribution
 }
 \examples{
-mysample()
+mysample(5)
 
 }

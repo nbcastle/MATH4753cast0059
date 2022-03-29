@@ -291,3 +291,42 @@ myddt <- function(df, spec){
 }
 
 
+
+
+#' @title central limit theorem applied to poisson distribution
+#' @description applies the central limit theorem to the poisson distribution
+#' and displays a histogram of the means distribution density
+#'
+#' @param n sample size
+#' @param iter number of iterations
+#' @param lambda mean and sd of the poisson distribution
+#' @param ... other parameters of the main histogram
+#'
+#' @return returns a list of the means of each iteration and plots of probability density
+#' for the mean, the poisson distribution, and a relative frequency plot
+#' @export
+#'
+#' @examples
+#' mycltp(5, 100)
+#'
+mycltp=function(n,iter,lambda=10,...){
+
+  y=rpois(n*iter,lambda=lambda) # random sample from poisson distribution
+  data=matrix(y,nr=n,nc=iter,byrow=TRUE) # place samples in matrix by column
+  w=apply(data,2,mean) # take mean of samples by column
+  param=hist(w,plot=FALSE) # find the max density with empty plot
+  ymax=1.1*max(param$density) # make max bound with a lil wiggle room
+
+  layout(matrix(c(1,1,2,3),nr=2,nc=2, byrow=TRUE)) # layout matrix for multiple graphs
+
+  hist(w,freq=FALSE,  ylim=c(0,ymax), col=rainbow(max(w)),
+       main=paste("Histogram of sample mean","\n", "sample size= ",n," iter=",iter," lambda=",lambda,sep=""),
+       xlab="Sample mean",...) # the primary hist is made
+  curve(dnorm(x,mean=lambda,sd=sqrt(lambda/n)),add=TRUE,col="Red",lty=2,lwd=3) # add a theoretical curve
+
+  # Now make a new barplot because y is discrete
+  barplot(table(y)/(n*iter),col=rainbow(max(y)), main="Barplot of sampled y", ylab ="Rel. Freq",xlab="y" ) # relative frequency plot
+  x=0:max(y) # x values for plot
+  plot(x,dpois(x,lambda=lambda),type="h",lwd=5,col=rainbow(max(y)),
+       main="Probability function for Poisson", ylab="Probability",xlab="y") # probability function plot
+}

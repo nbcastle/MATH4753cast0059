@@ -23,7 +23,7 @@ myboot2(iter = 10000, x, fun = "mean", alpha = 0.05, cx = 1.5, ...)
 a list of confidence interval, function, vector, and results per iter
 }
 \description{
-
+This function uses bootstrapping to apply a function to a sample
 }
 \examples{
 x = 1:10

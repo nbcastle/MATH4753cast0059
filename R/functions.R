@@ -13,8 +13,8 @@
 #' @export
 #'
 #' @examples
-#' dird = "C:\\Users\\Admin\\Desktop\\Applied Statistical Methods\\Lab 4\\"
-#' data = myread(dird, 'SPRUCE.csv')
+#' \dontrun{dird = "C:\\Users\\Admin\\Desktop\\Applied Statistical Methods\\Lab 4\\"
+#' data = myread(dird, 'SPRUCE.csv')}
 #'
 myread=function(dird, csv){
   fl=paste(dird,csv,sep="")
@@ -312,12 +312,12 @@ myddt <- function(df, spec){
 mycltp=function(n,iter,lambda=10,...){
 
   y=rpois(n*iter,lambda=lambda) # random sample from poisson distribution
-  data=matrix(y,nr=n,nc=iter,byrow=TRUE) # place samples in matrix by column
+  data=matrix(y,nrow=n,ncol=iter,byrow=TRUE) # place samples in matrix by column
   w=apply(data,2,mean) # take mean of samples by column
   param=hist(w,plot=FALSE) # find the max density with empty plot
   ymax=1.1*max(param$density) # make max bound with a lil wiggle room
 
-  layout(matrix(c(1,1,2,3),nr=2,nc=2, byrow=TRUE)) # layout matrix for multiple graphs
+  layout(matrix(c(1,1,2,3),nrow=2,ncol=2, byrow=TRUE)) # layout matrix for multiple graphs
 
   hist(w,freq=FALSE,  ylim=c(0,ymax), col=rainbow(max(w)),
        main=paste("Histogram of sample mean","\n", "sample size= ",n," iter=",iter," \nlambda=",lambda,sep=""),
@@ -335,7 +335,7 @@ mycltp=function(n,iter,lambda=10,...){
 
 
 #' @title Bootstrapping function for basic stats
-#' @description
+#' @description This function uses bootstrapping to apply a function to a sample
 #'
 #' @param iter number of iterations
 #' @param x vector to evaluate
@@ -354,7 +354,7 @@ myboot2<-function(iter=10000,x,fun="mean",alpha=0.05,cx=1.5,...){  #Notice where
   n=length(x)   # calculate sample size
 
   y=sample(x,n*iter,replace=TRUE) # retrieve samples for all its
-  rs.mat=matrix(y,nr=n,nc=iter,byrow=TRUE) # place in matrix by row
+  rs.mat=matrix(y,nrow=n,ncol=iter,byrow=TRUE) # place in matrix by row
   xstat=apply(rs.mat,2,fun) # xstat is a vector and will have iter values in it
   ci=quantile(xstat,c(alpha/2,1-alpha/2))# find the requested CI
   para=hist(xstat,freq=FALSE,las=1,
@@ -362,7 +362,7 @@ myboot2<-function(iter=10000,x,fun="mean",alpha=0.05,cx=1.5,...){  #Notice where
             ...) # create the histogram
 
   # make a matrix of source data in a collumn for other stats
-  mat=matrix(x,nr=length(x),nc=1,byrow=TRUE)
+  mat=matrix(x,nrow=length(x),ncol=1,byrow=TRUE)
 
   pte=apply(mat,2,fun) # find point estimate of whole column
   abline(v=pte,lwd=3,col="Black") # Vertical line
@@ -379,18 +379,19 @@ myboot2<-function(iter=10000,x,fun="mean",alpha=0.05,cx=1.5,...){  #Notice where
 
 
 #' @title my ml for normal distribution
-#' @description
+#' @description this uses maximum likelihood to determine the mean of a sample
 #'
 #' @param x data to evaluate
 #' @param mu vector of potential mean values
 #' @param sig vector of potential sd values
-#' @param ...
+#' @param ... extra parameters for the plot
 #'
 #' @return data, maximum likelihood, coords
 #' @export
 #'
 #' @examples
-#' mymlnorm(x=c(10,12,13,15,12,11,10),mu=seq(10,14,length=1000),sig=seq(0.1,4,length=1000),lwd=2,labcex=1)
+#' mymlnorm(x=c(10,12,13,15,12,11,10),mu=seq(10,14,length=1000),
+#' sig=seq(0.1,4,length=1000),lwd=2,labcex=1)
 #'
 mymlnorm=function(x,mu,sig,...){  #x sample vector
   nmu=length(mu) # number of values in mu

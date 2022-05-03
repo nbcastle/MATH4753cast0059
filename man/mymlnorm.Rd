@@ -13,15 +13,16 @@ mymlnorm(x, mu, sig, ...)
 
 \item{sig}{vector of potential sd values}
 
-\item{...}{}
+\item{...}{extra parameters for the plot}
 }
 \value{
 data, maximum likelihood, coords
 }
 \description{
-
+this uses maximum likelihood to determine the mean of a sample
 }
 \examples{
-mymlnorm(x=c(10,12,13,15,12,11,10),mu=seq(10,14,length=1000),sig=seq(0.1,4,length=1000),lwd=2,labcex=1)
+mymlnorm(x=c(10,12,13,15,12,11,10),mu=seq(10,14,length=1000),
+sig=seq(0.1,4,length=1000),lwd=2,labcex=1)
 
 }

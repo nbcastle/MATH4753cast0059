@@ -18,7 +18,7 @@ table containing data
 This function reads .csv data into the environment
 }
 \examples{
-dird = "C:\\\\Users\\\\Admin\\\\Desktop\\\\Applied Statistical Methods\\\\Lab 4\\\\"
-data = myread(dird, 'SPRUCE.csv')
+\dontrun{dird = "C:\\\\Users\\\\Admin\\\\Desktop\\\\Applied Statistical Methods\\\\Lab 4\\\\"
+data = myread(dird, 'SPRUCE.csv')}
 
 }

@@ -428,22 +428,29 @@ ddt is a dataset containing the information on DDT concentration, length, weight
 ### Variables
 
 1. RIVER
+
 Name of the river the fish was caught in
 
 2. MILE
+
 Miles from mouth of river the fish was caught at
 
 3. LENGTH
+
 Length of the fish
 
 4. WEIGHT
+
 Weight of the fish
 
 5. SPECIES
+
 Species of the fish caught
 
 6. DDT
+
 DDT concentration in the fish
+
 
 ```{r}
 
@@ -460,13 +467,15 @@ spruce is a dataset containing the height and breast height diameter of trees, b
 
 ### Variables
 
-1.Height
+
+1. Height
 
 the height of the spruce tree
 
 2. BHDiameter
 
 The breast height diameter of the spruce tree
+
 
 ```{r}
 
@@ -483,10 +492,13 @@ firedam is a dataset containing information on distance and damage of fires as a
 
 ### Variables
 
+
 1. DISTANCE
+
 The distance traveled of fire
 
 2. DAMAGE
+
 The damage of fire
 
 

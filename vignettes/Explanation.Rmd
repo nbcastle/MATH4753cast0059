@@ -295,7 +295,15 @@ This is mostly applicable to the ddt dataframe, a dataframe of data on fish leng
 
 data(ddt)
 
-myddt(ddt, 'CCATFISH')
+out = myddt(ddt, 'CCATFISH')
+
+out$plot
+
+out$`relative frequency of river table`
+
+head(out$dataframe)
+
+head(out$`subsetted dataframe`)
 
 ```
 

@@ -24,6 +24,6 @@ ddt
 }
 \description{
 A dataset containing the information on
-ddt, length, weight, species, river, and mile measurements
+ddt, length, weight, species, river, and mile measurements of fish caught
 }
 \keyword{datasets}

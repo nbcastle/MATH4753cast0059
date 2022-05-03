@@ -59,7 +59,7 @@ mybin=function(iter=100,n=10, p=0.5){
   succ.tab=table(factor(succ,levels=0:n))
   #Make a barplot of the proportions
   barplot(succ.tab/(iter), col=rainbow(n+1),
-          main=paste("binomial distribution  ", " iteration ",
+          main=paste("binomial distribution  \n", " iteration ",
                      i, " n= ", n,sep=""),
           xlab="Number of successes"
   )
@@ -108,7 +108,7 @@ mymult=function(iter=100,n=10, p=c(1,1,1,1)/4){
   names(freq)=1:k
   #create a barplot of relative freq
   barplot(freq/(n*iter),col=rainbow(k),
-          main=paste("multinomial distribution  ", " iteration ",
+          main=paste("multinomial distribution  \n", " iteration ",
                      i, " n= ", n,sep="")
   )
   tab.mat
@@ -152,7 +152,7 @@ myhyper=function(iter=100,N=20,r=12,n=5){
   succ.tab=table(factor(succ,levels=0:n))
   #Make a barplot of the proportions
   barplot(succ.tab/(iter), col=rainbow(n+1),
-          main=paste("hypergeom. distribution  ", " iteration ", i, " n= ", n,sep=""),
+          main=paste("hypergeom. distribution  \n", " iteration ", i, " n= ", n,sep=""),
           xlab="successes"
   )
   succ.tab/iter
@@ -191,13 +191,13 @@ mysample=function(n, N=10, iter=10,time=0.1, last=FALSE, rep=TRUE){
     #make a barplot
     if(last == FALSE) {
       barplot(table(sf)/n,beside=TRUE,col=rainbow(N),
-              main=paste("sample  ", " iteration ", i, " n= ", n,sep="") ,
+              main=paste("sample \n ", " iteration ", i, " n= ", n,sep="") ,
               ylim=c(0,0.2)
       )
     } else {
       if(i == iter)
         barplot(table(sf)/n,beside=TRUE,col=rainbow(N),
-                main=paste("sample  ", " iteration ", i, " n= ", n,sep="") ,
+                main=paste("sample  \n", " iteration ", i, " n= ", n,sep="") ,
                 ylim=c(0,0.2)
         )
     }
@@ -320,7 +320,7 @@ mycltp=function(n,iter,lambda=10,...){
   layout(matrix(c(1,1,2,3),nr=2,nc=2, byrow=TRUE)) # layout matrix for multiple graphs
 
   hist(w,freq=FALSE,  ylim=c(0,ymax), col=rainbow(max(w)),
-       main=paste("Histogram of sample mean","\n", "sample size= ",n," iter=",iter," lambda=",lambda,sep=""),
+       main=paste("Histogram of sample mean","\n", "sample size= ",n," iter=",iter," \nlambda=",lambda,sep=""),
        xlab="Sample mean",...) # the primary hist is made
   curve(dnorm(x,mean=lambda,sd=sqrt(lambda/n)),add=TRUE,col="Red",lty=2,lwd=3) # add a theoretical curve
 
@@ -330,3 +330,99 @@ mycltp=function(n,iter,lambda=10,...){
   plot(x,dpois(x,lambda=lambda),type="h",lwd=5,col=rainbow(max(y)),
        main="Probability function for Poisson", ylab="Probability",xlab="y") # probability function plot
 }
+
+
+
+
+#' @title Bootstrapping function for basic stats
+#' @description
+#'
+#' @param iter number of iterations
+#' @param x vector to evaluate
+#' @param fun function to apply
+#' @param alpha confidence value
+#' @param cx numeric character expansion factor
+#' @param ... other params for hist
+#'
+#' @return a list of confidence interval, function, vector, and results per iter
+#' @export
+#'
+#' @examples
+#' x = 1:10
+#' myboot2(x=x)
+myboot2<-function(iter=10000,x,fun="mean",alpha=0.05,cx=1.5,...){  #Notice where the ... is repeated in the code
+  n=length(x)   # calculate sample size
+
+  y=sample(x,n*iter,replace=TRUE) # retrieve samples for all its
+  rs.mat=matrix(y,nr=n,nc=iter,byrow=TRUE) # place in matrix by row
+  xstat=apply(rs.mat,2,fun) # xstat is a vector and will have iter values in it
+  ci=quantile(xstat,c(alpha/2,1-alpha/2))# find the requested CI
+  para=hist(xstat,freq=FALSE,las=1,
+            main=paste("Histogram of Bootstrap\nsample statistics","\n","alpha=",alpha," iter=",iter,sep=""),
+            ...) # create the histogram
+
+  # make a matrix of source data in a collumn for other stats
+  mat=matrix(x,nr=length(x),nc=1,byrow=TRUE)
+
+  pte=apply(mat,2,fun) # find point estimate of whole column
+  abline(v=pte,lwd=3,col="Black") # Vertical line
+  segments(ci[1],0,ci[2],0,lwd=4)      # Make the segment for the ci
+  text(ci[1],0,paste("(",round(ci[1],2),sep=""),col="Red",cex=cx)
+  text(ci[2],0,paste(round(ci[2],2),")",sep=""),col="Red",cex=cx)
+
+  # plot the point estimate 1/2 way up the density
+  text(pte,max(para$density)/2,round(pte,2),cex=cx)
+
+  invisible(list(ci=ci,fun=fun,x=x,xstat=xstat))# output
+}
+
+
+
+#' @title my ml for normal distribution
+#' @description
+#'
+#' @param x data to evaluate
+#' @param mu vector of potential mean values
+#' @param sig vector of potential sd values
+#' @param ...
+#'
+#' @return data, maximum likelihood, coords
+#' @export
+#'
+#' @examples
+#' mymlnorm(x=c(10,12,13,15,12,11,10),mu=seq(10,14,length=1000),sig=seq(0.1,4,length=1000),lwd=2,labcex=1)
+#'
+mymlnorm=function(x,mu,sig,...){  #x sample vector
+  nmu=length(mu) # number of values in mu
+  nsig=length(sig)
+  n=length(x) # sample size
+  zz=c()    # get zz readyr
+  lfun=function(x,m,p) log(dnorm(x,mean=m,sd=p))   # log like fn for normal dist
+  for(j in 1:nsig){
+    z=outer(x,mu,lfun,p=sig[j]) # create the matrix
+    # col 1 of z contains lfun evaluated at each x with first value of mu,
+    # col2 each x with 2nd value of m
+    y=apply(z,2,sum)
+    # sum for all mus
+    zz=cbind(zz,y)
+    ## all log l values
+  }
+  maxl=max(exp(zz)) # find maxes index and retrieve value
+  coord=which(exp(zz)==maxl,arr.ind=TRUE)
+  maxlsig=apply(zz,1,max)
+  contour(mu,sig,exp(zz),las=3,xlab=expression(mu),ylab=expression(sigma),axes=TRUE,
+          main=expression(paste("L(",mu,",",sigma,")",sep="")),...) # create contours
+  mlx=round(mean(x),2)  # theoretical
+  mly=round(sqrt((n-1)/n)*sd(x),2)
+  #axis(1,at=c(0:20,mlx),labels=sort(c(0:20,mlx)))
+  #axis(2,at=c(0:20,mly),labels=TRUE)
+  abline(v=mean(x),lwd=2,col="Green")
+  abline(h=sqrt((n-1)/n)*sd(x),lwd=2,col="Red")
+
+  # Now find the estimates from the co-ords
+  muest=mu[coord[1]]
+  sigest=sig[coord[2]]
+  abline(v=muest, h=sigest) # crosshair
+  return(list(x=x,coord=coord,maxl=maxl))
+}
+

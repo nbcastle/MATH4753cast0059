@@ -1,7 +1,7 @@
 #' Information on ddt and measurements of fish in different rivers
 #'
 #' A dataset containing the information on
-#' ddt, length, weight, species, river, and mile measurements
+#' ddt, length, weight, species, river, and mile measurements of fish caught
 #'
 #' @format A data frame with 144 rows and 6 variables:
 #' \describe{

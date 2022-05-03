@@ -1,11 +1,13 @@
 ---
 title: "What the package does"
 output: rmarkdown::html_vignette
+
 vignette: >
   %\VignetteIndexEntry{What the package does}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -16,4 +18,475 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(MATH4753cast0059)
+library(dplyr)
 ```
+
+# Package Purpose
+
+The package includes a variety of functions related to statistics which were made and used in MATH 4753, Applied Statistical Methods. This includes a variety of functions which help analyze probability distributions, a function to easily import data, functions for sampling populations, bootstrapping, and more.
+
+
+
+# Functions
+
+## myread()
+
+### Purpose
+
+This function reads .csv data into the environment. It can make it easier to draw data from a folder which is not in the local directory of the project or script.
+
+### Use cases
+
+This is most useful when there are multiple files you wish to draw from in a data source not in the local directory. This avoids the unnecessary hassle and waste of storage that copying them over would entail.
+
+### Parameters
+
+1. dird: directory csv is stored in
+2. csv: the title of the .csv title as a string
+
+It returns the data in the form of a table.
+
+### Demonstration
+
+To demonstrate I will create a temporary file and read it into the global environment. This is done using an empty string for the directory and the output of the tempfile() function for the name of the .csv.
+
+```{r}
+
+data(firedam)
+
+test1 <- as.character(firedam$DISTANCE)
+tf <- tempfile()
+writeLines(test1, tf)
+
+
+dat = MATH4753cast0059::myread('', tf)
+
+dat
+
+summary(dat)
+
+```
+
+As you can see, the data is read into r as a data frame and can be manipulated as any other.
+
+
+
+## mybin()
+
+### Purpose
+
+mybin() assumes a binomial probability distribution and determines the  most likely number of successes in each iteration given a probability. The function adds the number of iterations that received each number of successes and divides by the overall number of iterations, ending in a plot and table which give the relative frequency of each result.
+
+
+### Use cases
+
+This could be useful in applications where you would like to visualize the distribution of some kind of normally distributed binary variable. This could be something like a series of coin flips.
+
+
+### Parameters
+
+1. iter: The number of iterations
+2. n: The number of samples taken each iteration, with replacement
+3. p: The probability of a TRUE result
+
+
+### Demonstration
+
+Let's assume that we have a large population of binomial results with half being TRUE and half being FALSE, much like a series of coin flips. We would like to take 10 samples, or 10 coin flips, from this population and record the number which were TRUE. We would like to repeat this 100 times and combine the results to obtain our final distribution. We would apply mybin() in the following way:
+
+```{r}
+
+MATH4753cast0059::mybin(iter = 100, n = 10, p = 0.5)
+
+```
+
+mybin() tells us that the binomial distribution could be approximated with a normal distribution centered about a mean of 5 successes. If we were to increase the number of iterations this would become even more apparent, like so.
+
+```{r}
+
+MATH4753cast0059::mybin(iter = 10000, n = 10, p = 0.5)
+
+```
+
+
+
+
+## mymult()
+
+
+### Purpose
+
+mymult() assumes a multinomial distribution and finds the most likely number of successes given an array of probabilities, 1 per option. The function adds the number of iterations that received each number of successes, divides by overall number of iterations, and represents the distribution as a percentage in a relative frequency format.
+
+
+### Use cases
+
+This could be used in applications where there is a categorical variable with multiple options which have differing probabilities. An example of this could be responses to a multiple choice survey question or region of respondents residence in the United States.
+
+### Parameters
+
+1. iter: The number of iterations
+2. n: The number of samples taken each iteration, with replacement
+3. p: The array of probabilities for each outcome which together must add to 1
+
+
+### Demonstration
+
+To demonstrate this function I will assume that there is a categorical variable with four different possible values, each with its own probability. We could draw from a population of responses to a multiple choice question and determine their probabilities. We would like to visualize their distribution using mymult. In this example we will examine the likelihood of collecting a given fish species in a river in the ddt dataset. We would apply the function in the following way:
+
+```{r}
+data(ddt)
+
+table(ddt$SPECIES, ddt$RIVER)
+
+ddt %>% filter(RIVER == 'TRM') %>% group_by(SPECIES) %>% tally() -> p
+
+table(p)
+
+p$SPECIES
+
+p$n/sum(p$n)
+
+MATH4753cast0059::mymult(iter=100,n=10, p=p$n/sum(p$n))
+
+
+```
+
+This shows our multinomial distribution and allows us to make some conjectures about a larger data set than ddt. We get a good visual of some of the possible results given the number of fish of each species captured.
+
+
+
+## myhyper()
+
+
+### Purpose
+
+This is a function which shows the hypergeometric distribution of a sample. It shows probability of each number of successes while sampling without replacement.
+
+
+### Use cases
+
+The hypergeometric distribution can be used to model binomial sampling without replacement. This is useful when the sample size relative to the population is large as sampling without replacement or when there are relatively small number of TRUE values corresponding to a low probability. This is useful in applications like modeling the probability of a defective part in an assemlby line.
+
+### Parameters
+
+1. iter: The number of iterations
+2. N: The population size
+3. r: The number of successes in the population
+4. n: The number of samples each iteration without replacement
+
+
+### Demonstration
+
+
+We have observed two faulty parts due to faulty machinery on an assembly line out of a run of 100. We would like to model the probability distribution for faulty parts on our line through 100 runs to determine the right number we should sample to detect at least one. We will sample 5 parts from each simulated run. We would apply myhyper() in the following way:
+
+```{r}
+
+MATH4753cast0059::myhyper(iter=100,N=100,r=2,n=5)
+
+```
+
+myhyper() indicates that sampling 5 parts from the line is likely not enough to detect faulty machinery as, assuming two defective parts in a run, we will only catch one of the parts a fraction of the time. Let's see what a greater sample size would look like.
+
+```{r}
+
+MATH4753cast0059::myhyper(iter=100,N=100,r=2,n=25)
+
+```
+
+If we sample a quarter of the parts and we assume two faulty parts in a run then we will catch at least one about 45 or 50% of the time. This is much better and allows faults in equipment to be caught relatively quickly and prior runs to be examined.
+
+
+## mysample()
+
+
+### Purpose
+
+This function takes n samples each iteration from the population with replacement and shows the distribution for each sample. 
+
+### Use cases
+
+This could be useful as a way to sample data by index and visualize which indices were selected. It should follow a roughly uniform distribution as all probabilities are equal.
+
+### Parameters
+
+1. n: The number of samples each iteration
+2. N: The size of each sample
+3. rep: Sample with or without replacement (True or False)
+4. iter: The number of iterations
+5. time: The time between showing each plot
+6. last: This indicates that only last bar plot should be displayed if set to TRUE
+
+### Demonstration
+
+We have a sample of 10 values from a population and would like to randomly select 5 with replacement for further analysis. We could apply our function in the following way:
+
+```{r}
+
+data(spruce)
+
+sam = MATH4753cast0059::mysample(n = 15, N = length(spruce$BHDiameter), iter = 5 )
+
+sam
+
+```
+
+
+We could then extract the data at those indices to get our desired random sample.
+
+
+
+## myncurve()
+
+
+### Purpose
+
+This function uses a given mean and standard deviation to create a normal distribution, calculates the probability of a result below a which shows as shaded region in the plot, and prints the associated value to the console.
+
+
+### Use cases
+
+This function could be useful when trying to visualize a normal distribution with known mean and standard deviation to see what the probability is for a value to occur in a given region. An example could use student grade data and determine the percentage of students which scored lower than c.
+
+### Parameters
+
+1. mu: The average of distribution
+2. sigma: The standard deviation of the distribution
+3. a: The upper limit for the probability, marks the filled region
+
+### Demonstration
+
+Following the use case I gave earlier, let's assume that a class of students had an average of an 80% on an exam with a standard deviation of 7%. We would apply myncurve() in the following way:
+
+```{r}
+
+myncurve(mu = 80, sigma = 7, a = 70)
+
+```
+
+myncurve() shows a plot visualizing the data and tells us the probability we were looking for, about 8% of students in the class scored lower than a c on the exam.
+
+
+
+
+
+
+
+## myddt()
+
+
+### Purpose
+
+This function subsets the ddt dataframe by a species given as a parameter. It generates a corresponding plot, df before and after subsetting, and a relative frequency of river table.
+
+### Use cases
+
+This is mostly applicable to the ddt dataframe, a dataframe of data on fish length, weight, concentration of DDT, and more.
+
+### Parameters
+
+1. df: The ddt dataframe or one very similar
+2. spec: The species selected by the user
+
+### Demonstration
+
+```{r}
+
+data(ddt)
+
+myddt(ddt, 'CCATFISH')
+
+```
+
+It gives us a nice plot of length and weight of the selected species in each river, a relative frequency table for each river, and the subsetted dataframe.
+
+
+
+## mycltp()
+
+
+### Purpose
+
+This function applies the central limit theorem to the poisson distribution and displays a histogram of the means distribution density. This gives us the mean of each iteration it conducts with a given lambda and sample size and a relative frequency plot for each result.
+
+### Use cases
+
+The poisson distribution can help us predict the occurrence of rare, unrelated events in a unit of time, area, or volume. By predicting the mean we can figure out the number of events to expect. This could be applied to something like the number of calls recieved in an hour at a call center.
+
+### Parameters
+
+1. n: The sample size
+2. iter: The number of iterations
+3. lambda: The mean and standard deviation of the poisson distribution
+4. ...: Space for optional parameters for the main histogram
+
+### Demonstration
+
+
+If we have a sample of 5 calls received in an hour and would like to expand this data to cover other possibilities we might use the mycltp function like so:
+
+```{r}
+par(mar=c(3,3,3,0))
+
+MATH4753cast0059::mycltp(n = 5, iter = 100, lambda = 10)
+
+```
+
+These plots show us that 10 is the most likely number of occurances but that it is likely to have a fairly significant range.
+
+
+
+
+
+## myboot2()
+
+
+### Purpose
+
+This function is useful in applying a function to data through the method of bootstrapping, where it extrapolates the data to create iter number of new samples which it calculates the result of the function along with confidence intervals.
+
+### Use cases
+
+This could be used for really any sample of real data which ones wishes to extrapolate to a larger data set.
+
+### Parameters
+
+1. iter: The number of iterations
+2. x: The vector to evaluate
+3. fun: The function to apply to the vector
+4. alpha: The confidence value
+5. cx: The numeric character expansion factor
+6.  ... Space for optional parameters for the main histogram
+
+
+
+### Demonstration
+
+If we wish to find the mean length of catfish in the TRM river of the DDT dataset then we would want to apply myboot2 to ddt like so:
+
+```{r}
+
+data(ddt)
+
+ddt %>% filter(RIVER == 'TRM', SPECIES == 'CCATFISH') %>% select(LENGTH) -> sam
+
+MATH4753cast0059::myboot2(iter=10000,sam$LENGTH,fun="mean",alpha=0.05,cx=1.5)
+
+```
+
+We can see that the average length is 44.68 with a fairly small confidence interval so if this sample is representative of the population we can be fairly certain the mean will not change.
+
+
+## mymlnorm()
+
+
+### Purpose
+
+This function computes the maximum likelihood value for the mean and standard deviation of a sample of data, most likely a column of a data frame. It is most useful if the data is approximately normal in its distribution.
+
+### Use cases
+
+This could help determine the mean and standard deviation of data, with a constant expected value and variance, in a number of situations. One example could be the levels of carbon dioxide present in the air at a specific time or the breast height diameter of trees.
+
+
+### Parameters
+
+1. x: The data (vector) to evaluate
+2. mu: A vector of potential mean values
+3. sig: A vector of potential values for the standard deviation
+4. ...:  Provides space for additional parameters for the contour plot
+
+### Demonstration
+
+
+If we want to determine and visualize the mean and standard deviation of data, in this case breast height diameter of spruce trees, along with confidence intervals then we might apply mymlnorm() in the following way: 
+
+```{r}
+
+data(spruce)
+
+MATH4753cast0059::mymlnorm(spruce$BHDiameter,mu=seq(16,21,length=100),sig=seq(3.5,6.5,length=100),lwd=2,labcex=1)
+
+```
+
+
+# Data
+
+## ddt
+
+ddt is a dataset containing the information on DDT concentration, length, weight, species, river caught in, and mile measurements of fish surveyed. This data was collected to determine the prevalence of DDT in their environment.
+
+### Variables
+
+1. RIVER
+Name of the river the fish was caught in
+
+2. MILE
+Miles from mouth of river the fish was caught at
+
+3. LENGTH
+Length of the fish
+
+4. WEIGHT
+Weight of the fish
+
+5. SPECIES
+Species of the fish caught
+
+6. DDT
+DDT concentration in the fish
+
+```{r}
+
+data(ddt)
+
+head(ddt)
+
+```
+
+
+## spruce
+
+spruce is a dataset containing the height and breast height diameter of trees, both numeric variables. This data was collected in the hopes that breast height diameter is a good way to find an estimate for spruce tree height.
+
+### Variables
+
+1.Height
+
+the height of the spruce tree
+
+2. BHDiameter
+
+The breast height diameter of the spruce tree
+
+```{r}
+
+data(spruce)
+
+head(spruce)
+
+```
+
+
+##  firedam
+
+firedam is a dataset containing information on distance and damage of fires as a record of their severity and for inference for future fires.
+
+### Variables
+
+1. DISTANCE
+The distance traveled of fire
+
+2. DAMAGE
+The damage of fire
+
+
+```{r}
+
+data(firedam)
+
+head(firedam)
+
+```
+
